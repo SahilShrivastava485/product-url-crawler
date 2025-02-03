@@ -1,0 +1,22 @@
+# Ignore the virtual environment folder
+env/
+
+# Bytecode & cache files
+__pycache__/
+*.py[cod]
+
+# Logs
+*.log
+
+# IDE files (VSCode, PyCharm, etc.)
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Dependencies (if using pipenv or poetry)
+Pipfile
+Pipfile.lock
+poetry.lock
