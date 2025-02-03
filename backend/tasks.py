@@ -1,6 +1,8 @@
+import asyncio
+import json
+import os
 from celery import Celery
 from aiohttp import ClientSession
-import asyncio
 from crawler.fetcher import fetch_html  # Import your updated fetch_html function
 from crawler.parser import extract_product_urls_from_html, extract_product_urls_from_api  # Import parsing functions
 from crawler.config import MAX_PRODUCT_LINKS
@@ -25,12 +27,17 @@ async def fetch_all_pages(start_url):
             html_or_json = await fetch_html(session, current_url)
             
             if isinstance(html_or_json, dict):  # API-based infinite scroll
-                products, next_token = extract_product_urls_from_api(html_or_json)
+                products, next_page_token, next_url, next_offset = extract_product_urls_from_api(html_or_json)
                 collected_urls.update(products)
-                if not next_token:  # No more data to fetch
+                 # Decide next request method
+                if next_page_token:
+                    current_url = f"{start_url}?next_page_token={next_page_token}"
+                elif next_url:
+                    current_url = next_url
+                elif next_offset:
+                    current_url = f"{start_url}?offset={next_offset}"
+                else:
                     break
-                # Update the API call parameters for the next page (e.g., using the next_token)
-                current_url = f"{start_url}?next_token={next_token}"  # Example; adjust for your API
 
             elif isinstance(html_or_json, str):  # Standard pagination (HTML)
                 product_urls, next_page_url = extract_product_urls_from_html(html_or_json, current_url, collected_urls)
@@ -43,6 +50,24 @@ async def fetch_all_pages(start_url):
             # Stop if we've reached the max limit of product URLs
             if len(collected_urls) >= MAX_PRODUCT_LINKS:
                 break
-
+    save_collected_urls_to_json(start_url, collected_urls)
     print(f"Collected {len(collected_urls)} product URLs.")
     return collected_urls
+
+def save_collected_urls_to_json(start_url, collected_urls):
+    """Save the collected URLs to a JSON file, updating the existing data."""
+    file_path = "collected_urls.json"
+    
+    # Load existing data from the file, if it exists
+    if os.path.exists(file_path):
+        with open(file_path, "r") as file:
+            data = json.load(file)
+    else:
+        data = {}
+
+    # Update the data with the current URL and collected URLs
+    data[start_url] = list(collected_urls)
+
+    # Save the updated data back to the JSON file
+    with open(file_path, "w") as file:
+        json.dump(data, file, indent=4)

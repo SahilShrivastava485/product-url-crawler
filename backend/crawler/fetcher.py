@@ -37,7 +37,6 @@ async def fetch_all_pages(session, start_url):
     """Fetch pages and handle both pagination and infinite scroll dynamically."""
     collected_urls = set()
     current_url = start_url
-    is_api_based = False
 
     while current_url:
         print(f"Fetching: {current_url}")
