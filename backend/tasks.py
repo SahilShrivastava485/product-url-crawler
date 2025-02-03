@@ -46,6 +46,9 @@ async def fetch_all_pages(start_url):
                     break
                 # Update the URL to the next page
                 current_url = next_page_url
+            
+            elif not html_or_json:
+                break
 
             # Stop if we've reached the max limit of product URLs
             if len(collected_urls) >= MAX_PRODUCT_LINKS:

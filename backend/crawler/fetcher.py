@@ -13,7 +13,7 @@ async def fetch_html(session, url, retries=3, backoff_factor=1.5):
         headers = {"User-Agent": random.choice(USER_AGENTS)}
         for attempt in range(retries):
             try:
-                async with session.get(url, headers=headers, timeout=10) as response:
+                async with session.get(url, headers=headers, timeout=1000) as response:
                     if response.status == 200:
                         content_type = response.headers.get("Content-Type", "")
                         if "application/json" in content_type:
@@ -28,6 +28,12 @@ async def fetch_html(session, url, retries=3, backoff_factor=1.5):
                         wait_time = backoff_factor ** attempt
                         print(f"Rate limit on {url}, retrying in {wait_time}s...")
                         await asyncio.sleep(wait_time)
+                    elif response.status in [403]:
+                        print("can't access")
+                        return None
+                    else:
+                        print(response.status)
+                        await asyncio.sleep(0)
             except Exception as e:
                 print(f"Error fetching {url}: {e}")
                 await asyncio.sleep(2)  # Delay before retry
@@ -41,7 +47,7 @@ async def fetch_all_pages(session, start_url):
     while current_url:
         print(f"Fetching: {current_url}")
         html_or_json = await fetch_html(session, current_url)
-        
+        print(html_or_json)
         if isinstance(html_or_json, dict):  # API-based infinite scroll
             products, next_token = extract_product_urls_from_api(html_or_json)
             collected_urls.update(products)

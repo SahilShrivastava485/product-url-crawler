@@ -11,7 +11,7 @@ domains = [
     "https://www.lenskart.com/",
     "https://www.nykaa.com/",
     "https://www.reliancedigital.in/",
-    # "https://www.blinkit.com/"
+    "https://www.blinkit.com/"
 ]
 
 for domain in domains:
