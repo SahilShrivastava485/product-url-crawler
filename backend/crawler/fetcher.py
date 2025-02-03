@@ -47,7 +47,7 @@ async def fetch_all_pages(session, start_url):
     while current_url:
         print(f"Fetching: {current_url}")
         html_or_json = await fetch_html(session, current_url)
-        print(html_or_json)
+        
         if isinstance(html_or_json, dict):  # API-based infinite scroll
             products, next_token = extract_product_urls_from_api(html_or_json)
             collected_urls.update(products)
