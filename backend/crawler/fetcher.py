@@ -3,8 +3,34 @@ import random
 from crawler.config import USER_AGENTS, CONCURRENT_REQUESTS
 from crawler.parser import extract_product_urls_from_html, extract_product_urls_from_api
 import asyncio
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 
 semaphore = asyncio.Semaphore(CONCURRENT_REQUESTS)
+
+def fetch_html_selenium(url):
+    """Fetch HTML using Selenium when aiohttp fails."""
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Run in headless mode
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920x1080")
+    chrome_options.add_argument(f"user-agent={random.choice(USER_AGENTS)}")
+
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    try:
+        driver.get(url)
+        asyncio.sleep(3)  # Allow JavaScript to load
+        html_content = driver.page_source
+        return html_content
+    except Exception as e:
+        print(f"Selenium error: {e}")
+        return None
+    finally:
+        driver.quit()
 
 async def fetch_html(session, url, retries=3, backoff_factor=1.5):
     """Fetch HTML content from the provided URL."""
@@ -28,9 +54,9 @@ async def fetch_html(session, url, retries=3, backoff_factor=1.5):
                         wait_time = backoff_factor ** attempt
                         print(f"Rate limit on {url}, retrying in {wait_time}s...")
                         await asyncio.sleep(wait_time)
-                    elif response.status in [403]:
+                    elif response.status in range(400,499):
                         print("can't access")
-                        return None
+                        return fetch_html_selenium(url)
                     else:
                         print(response.status)
                         await asyncio.sleep(0)
@@ -47,7 +73,7 @@ async def fetch_all_pages(session, start_url):
     while current_url:
         print(f"Fetching: {current_url}")
         html_or_json = await fetch_html(session, current_url)
-        
+
         if isinstance(html_or_json, dict):  # API-based infinite scroll
             products, next_token = extract_product_urls_from_api(html_or_json)
             collected_urls.update(products)

@@ -4,14 +4,14 @@ from crawler.pattern_extractor import generate_combined_patterns
 domains = [
     "https://www.amazon.in/",
     "https://www.flipkart.com/",
-    "https://www.myntra.com/",
     "https://www.snapdeal.com/",
     "https://store.steampowered.com/",
     "https://www.bigbasket.com/",
     "https://www.lenskart.com/",
-    "https://www.nykaa.com/",
     "https://www.reliancedigital.in/",
-    "https://www.blinkit.com/"
+    "https://www.ajio.com/",
+    "https://www.titan.co.in/",
+    "https://www.ujam.com/",
 ]
 
 for domain in domains:

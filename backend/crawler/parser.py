@@ -8,19 +8,13 @@ import time
 
 def extract_product_urls_from_html(html, base_url, collected_urls):
     """Extract product URLs from HTML content while respecting the max limit."""
+    print("Contains Pagination")
     if not html or len(collected_urls) >= MAX_PRODUCT_LINKS:
         return set(), None
 
     soup = BeautifulSoup(html, "lxml")
     product_urls = set()
     extracted_patterns = generate_combined_patterns(base_url)
-    # for link in soup.find_all("a", href=True):
-    #     full_url = urljoin(base_url, link["href"])
-    #     if any(re.search(pattern, full_url) for pattern in extracted_patterns):
-    #         product_urls.add(full_url)
-    #         if len(collected_urls) + len(product_urls) >= MAX_PRODUCT_LINKS:
-    #             return product_urls, None  # Stop early if max limit is reached
-    
     for tag in soup.find_all(["a", "button", "div", "iframe"], href=True):
         full_url = urljoin(base_url, tag.get("href") or tag.get("data-href") or tag.get("src"))
         if any(re.search(pattern, full_url) for pattern in extracted_patterns):
@@ -44,6 +38,7 @@ def extract_product_urls_from_html(html, base_url, collected_urls):
 
 def extract_product_urls_from_api(json_data):
     """Extract product URLs from API response and determine next page information."""
+    print("Contains Infinite Scrolling")
     products = set()
     next_url = None
     next_page_token = None
