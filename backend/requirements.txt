@@ -3,3 +3,5 @@ beautifulsoup4>=4.12.2
 celery>=5.3.4
 lxml>=4.9.3
 redis>=5.0.1
+selenium
+webdriver-manager

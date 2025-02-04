@@ -13,7 +13,7 @@ def infer_patterns_from_urls():
         parsed = urlparse(url)
         segments = parsed.path.split("/")
         for segment in segments:
-            if segment and (segment.isdigit() or len(segment) > 2):  # Detect slugs or IDs
+            if segment and (segment.isdigit() or len(segment) > 2):
                 patterns.add(f"/{segment}/")
 
     return list(patterns)
@@ -60,16 +60,14 @@ def extract_patterns_from_sitemap(domain):
     for url in urls:
         parts = url.split("/")
         for part in parts:
-            if part.isdigit() or len(part) > 2:  # Detect product IDs or slugs
+            if part.isdigit() or len(part) > 2:
                 patterns.add(f"/{part}/")
 
     return list(patterns)
 
 def generate_combined_patterns(domain):
     """Generate product URL patterns using multiple sources."""
-    patterns = set(COMMON_PATTERNS)  # Start with common patterns
-
-    # Extract patterns dynamically
+    patterns = set(COMMON_PATTERNS)
     patterns.update(infer_patterns_from_urls())
     patterns.update(extract_patterns_from_robots(domain))
     patterns.update(extract_patterns_from_sitemap(domain))
