@@ -62,28 +62,3 @@ async def fetch_html(session, url, retries=3, backoff_factor=1.5):
                 print(f"Error fetching {url}: {e}")
                 await asyncio.sleep(2)
     return None
-
-async def fetch_all_pages(session, start_url):
-    """Fetch pages and handle both pagination and infinite scroll dynamically."""
-    collected_urls = set()
-    current_url = start_url
-
-    while current_url:
-        print(f"Fetching: {current_url}")
-        html_or_json = await fetch_html(session, current_url)
-
-        if isinstance(html_or_json, dict):
-            products, next_token = extract_product_urls_from_api(html_or_json)
-            collected_urls.update(products)
-            if not next_token:
-                break
-            current_url = f"{start_url}?next_token={next_token}"
-
-        elif isinstance(html_or_json, str): 
-            product_urls, next_page_url = extract_product_urls_from_html(html_or_json, current_url, collected_urls)
-            collected_urls.update(product_urls)
-            if not next_page_url: 
-                break
-            current_url = next_page_url
-
-    return collected_urls
