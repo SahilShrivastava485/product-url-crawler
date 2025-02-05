@@ -1,7 +1,5 @@
-import aiohttp
 import random
 from crawler.config import USER_AGENTS, CONCURRENT_REQUESTS
-from crawler.parser import extract_product_urls_from_html, extract_product_urls_from_api
 import asyncio
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -11,7 +9,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 semaphore = asyncio.Semaphore(CONCURRENT_REQUESTS)
 
 def fetch_html_selenium(url):
-    """Fetch HTML using Selenium when aiohttp fails."""
+    """Fetch HTML using Selenium when http fails."""
     chrome_options = Options()
     chrome_options.add_argument("--headless") 
     chrome_options.add_argument("--disable-gpu")

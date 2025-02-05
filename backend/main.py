@@ -15,6 +15,4 @@ domains = [
 ]
 
 for domain in domains:
-    # patterns = generate_combined_patterns(domain)
-    # print(f'{domain}:{patterns}')
-    crawl_website.delay(domain)  # Asynchronous execution using Celery
+    crawl_website.delay(domain)

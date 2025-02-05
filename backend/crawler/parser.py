@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 import re
-import json
 from urllib.parse import urljoin
 from crawler.config import MAX_PRODUCT_LINKS
 from crawler.pattern_extractor import generate_combined_patterns
